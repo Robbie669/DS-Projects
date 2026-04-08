@@ -6,7 +6,7 @@ Hi! I'm [Robbie] — this repo contains my DS projects and learning journey.
 
 | Project | Description | Tools | Notebook |
 |---------|-------------|-------|----------|
-| California Housing Price Prediction | Random Forest regression to predict median house prices | sklearn, pandas, matplotlib | [View](./DS-projects/california-housing) |
+| California Housing Price Prediction | Random Forest regression to predict median house prices | sklearn, pandas, matplotlib | [View](./DS-Projects/california-housing) |
 | Project 2 | What you analyzed + key insight | sklearn | [View](./projects/project-2/notebook.ipynb) |
 
 ## 📚 Topics Learned
