@@ -1,1 +1,41 @@
+⭐ Commonly Used Data Science Models (The Real Core Set)
+Across industries, a small set of models covers 80–90% of practical data science work.
+These are the models you will repeatedly use in enterprise, startups, consulting, and product teams.
 
+🔹 1. Linear Regression
+Use for: Predicting continuous values (sales, revenue, demand)
+Why it matters: Simple, interpretable, strong baseline
+
+🔹 2. Logistic Regression
+Use for: Binary classification (churn, fraud, conversion)
+Why it matters: Fast, stable, interpretable, great baseline
+
+🔹 3. Decision Trees
+Use for: Rule‑based modeling, feature importance, interpretable logic
+Why it matters: Human‑readable and easy to debug
+
+🔹 4. Random Forest
+Use for: Robust performance on tabular data with minimal tuning
+Why it matters: Industry staple for credit risk, marketing, operations
+
+🔹 5. Gradient Boosting (XGBoost / LightGBM / CatBoost)
+Use for: High‑performance modeling on structured/tabular data
+Why it matters: The workhorse of modern ML for business data
+
+🔹 6. K‑Means (and other clustering)
+Use for: Customer segmentation, product grouping, behavior clustering
+Why it matters: Fast, intuitive, widely used in analytics
+
+🔹 7. Time Series Models (ARIMA, Prophet, GBMs)
+Use for: Forecasting demand, sales, traffic, inventory
+Why it matters: Essential for planning and operations
+
+🔹 8. Neural Networks (when needed)
+Use for: Large, unstructured, or highly nonlinear data
+Why it matters: Powerful but not the default for business tabular data
+
+🧠 Summary Mental Model
+The models you actually use repeatedly:
+Linear Regression, Logistic Regression, Decision Trees, Random Forest, Gradient Boosting, K‑Means, Time Series models
+
+Everything else is niche or specialized.
