@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Models by Industry</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f14;--bg2:#13161e;--bg3:#1a1e28;--bg4:#0a0c10;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e8e6df;--muted:#7a7870;--dim:#3e3d3a;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;line-height:1.6}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+.wrapper{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:48px 24px 80px}
+
+/* Header */
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;opacity:0;animation:fadeUp .5s .1s forwards}
+h1{font-family:var(--font-head);font-size:clamp(26px,4.5vw,46px);font-weight:800;line-height:1.1;letter-spacing:-.02em;opacity:0;animation:fadeUp .5s .2s forwards}
+h1 span{color:var(--accent,#c8f06e)}
+.subtitle{font-size:13px;color:var(--muted);margin-top:10px;font-weight:300;opacity:0;animation:fadeUp .5s .3s forwards}
+.header{margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+
+/* Industry tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px;opacity:0;animation:fadeUp .5s .4s forwards}
+.tab-btn{font-family:var(--font-head);font-size:13px;font-weight:600;padding:8px 18px;border-radius:6px;border:1px solid var(--border2);background:var(--bg2);color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.01em}
+.tab-btn:hover{color:var(--text);border-color:rgba(255,255,255,.2)}
+.tab-btn.active{color:#0d0f14;border-color:transparent}
+.tab-btn[data-id="finance"].active{background:#c8f06e}
+.tab-btn[data-id="healthcare"].active{background:#6ee8f0}
+.tab-btn[data-id="retail"].active{background:#f0a06e}
+.tab-btn[data-id="manufacturing"].active{background:#e06ef0}
+.tab-btn[data-id="tech"].active{background:#6e90f0}
+
+/* Layout: left model list + right detail */
+.main-grid{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
+@media(max-width:680px){.main-grid{grid-template-columns:1fr}}
+
+/* Model list panel */
+.model-list-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;opacity:0;animation:fadeUp .4s .1s forwards;position:sticky;top:24px}
+.model-list-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+.model-btn{display:block;width:100%;text-align:left;font-family:var(--font-body);font-size:13px;padding:9px 12px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;margin-bottom:4px;line-height:1.4}
+.model-btn:hover{color:var(--text);background:var(--bg3);border-color:var(--border)}
+.model-btn.active{color:#0d0f14;border-color:transparent;font-weight:500}
+
+/* Accent colors per industry for model btn active */
+.industry-finance   .model-btn.active{background:#c8f06e}
+.industry-healthcare .model-btn.active{background:#6ee8f0}
+.industry-retail    .model-btn.active{background:#f0a06e}
+.industry-manufacturing .model-btn.active{background:#e06ef0}
+.industry-tech      .model-btn.active{background:#6e90f0}
+
+/* Right detail area */
+.detail-area{display:flex;flex-direction:column;gap:16px;opacity:0;animation:fadeUp .35s .15s forwards}
+
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
+
+/* Accent label color per industry */
+.industry-finance    .card-label{color:#c8f06e}
+.industry-healthcare .card-label{color:#6ee8f0}
+.industry-retail     .card-label{color:#f0a06e}
+.industry-manufacturing .card-label{color:#e06ef0}
+.industry-tech       .card-label{color:#6e90f0}
+
+/* Model title in detail */
+.model-title{font-family:var(--font-head);font-size:20px;font-weight:700;margin-bottom:4px}
+.model-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+.top-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.top-row{grid-template-columns:1fr}}
+
+/* Questions */
+.q-list{list-style:none}
+.q-list li{font-size:13px;color:var(--muted);padding:7px 0;border-bottom:1px solid var(--border);line-height:1.5;display:flex;gap:10px;align-items:baseline;transition:color .15s}
+.q-list li:last-child{border-bottom:none}
+.q-list li:hover{color:var(--text)}
+.q-list li::before{content:'→';font-family:var(--font-mono);font-size:10px;flex-shrink:0}
+.industry-finance    .q-list li::before{color:#c8f06e}
+.industry-healthcare .q-list li::before{color:#6ee8f0}
+.industry-retail     .q-list li::before{color:#f0a06e}
+.industry-manufacturing .q-list li::before{color:#e06ef0}
+.industry-tech       .q-list li::before{color:#6e90f0}
+
+/* Code */
+.code-wrap{background:var(--bg4);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:8px}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+.code-dots{display:flex;gap:5px}
+.code-dots span{width:9px;height:9px;border-radius:50%;background:var(--border2)}
+.code-lang{font-family:var(--font-mono);font-size:10px;color:var(--dim);letter-spacing:.08em}
+.copy-btn{font-family:var(--font-mono);font-size:10px;color:var(--muted);background:none;border:1px solid var(--border2);padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s;letter-spacing:.05em}
+.copy-btn:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
+.copy-btn.copied{color:#c8f06e;border-color:#c8f06e}
+pre{font-family:var(--font-mono);font-size:12px;line-height:1.8;padding:16px;overflow-x:auto;color:#c8c5bc}
+.kw{color:#c8a0f8}.fn{color:#6ee8b0}.cm{color:#4a5568;font-style:italic}.st{color:#f0c070}.nm{color:#6ec8f0}
+
+.metric-note{margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.03);border-left:2px solid var(--border2);border-radius:0 6px 6px 0;font-size:12px;color:var(--muted);font-family:var(--font-mono)}
+.metric-note strong{color:var(--text);font-weight:500}
+.industry-finance    .metric-note{border-left-color:#c8f06e}
+.industry-healthcare .metric-note{border-left-color:#6ee8f0}
+.industry-retail     .metric-note{border-left-color:#f0a06e}
+.industry-manufacturing .metric-note{border-left-color:#e06ef0}
+.industry-tech       .metric-note{border-left-color:#6e90f0}
+
+/* Panel hidden state */
+.industry-panel{display:none}
+.industry-panel.active{display:block}
+
+/* Detail swap animation */
+@keyframes detailIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.detail-area{animation:detailIn .25s forwards}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+pre::-webkit-scrollbar{height:4px}
+pre::-webkit-scrollbar-track{background:transparent}
+pre::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<header class="header">
+  <div class="eyebrow">// Data Science Reference</div>
+  <h1>ML Models <span>by Industry</span></h1>
+  <p class="subtitle">Click an industry → pick a model → see its questions &amp; workflow</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-id="finance"        onclick="showIndustry('finance',this)">Finance</button>
+  <button class="tab-btn"        data-id="healthcare"     onclick="showIndustry('healthcare',this)">Healthcare</button>
+  <button class="tab-btn"        data-id="retail"         onclick="showIndustry('retail',this)">Retail</button>
+  <button class="tab-btn"        data-id="manufacturing"  onclick="showIndustry('manufacturing',this)">Manufacturing</button>
+  <button class="tab-btn"        data-id="tech"           onclick="showIndustry('tech',this)">Tech / NLP</button>
+</nav>
+
+<!-- ═══════════════════════════════ FINANCE ═══════════════════════════════ -->
+<div class="industry-panel active" id="ip-finance">
+<div class="main-grid industry-finance">
+  <div class="model-list-card">
+    <div class="model-list-label">Models</div>
+    <button class="model-btn active" onclick="showModel('finance','xgboost',this)">XGBoost / LightGBM</button>
+    <button class="model-btn" onclick="showModel('finance','logreg',this)">Logistic Regression</button>
+    <button class="model-btn" onclick="showModel('finance','isoforest',this)">Isolation Forest</button>
+    <button class="model-btn" onclick="showModel('finance','lstm',this)">LSTM</button>
+    <button class="model-btn" onclick="showModel('finance','kmeans',this)">K-Means</button>
+    <button class="model-btn" onclick="showModel('finance','rf',this)">Random Forest</button>
+  </div>
+  <div id="detail-finance"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════ HEALTHCARE ═══════════════════════════════ -->
+<div class="industry-panel" id="ip-healthcare">
+<div class="main-grid industry-healthcare">
+  <div class="model-list-card">
+    <div class="model-list-label">Models</div>
+    <button class="model-btn active" onclick="showModel('healthcare','rf',this)">Random Forest</button>
+    <button class="model-btn" onclick="showModel('healthcare','logreg',this)">Logistic Regression</button>
+    <button class="model-btn" onclick="showModel('healthcare','cnn',this)">CNN (Imaging)</button>
+    <button class="model-btn" onclick="showModel('healthcare','cox',this)">Cox Survival Model</button>
+    <button class="model-btn" onclick="showModel('healthcare','xgboost',this)">XGBoost</button>
+    <button class="model-btn" onclick="showModel('healthcare','bert',this)">BERT (Clinical NLP)</button>
+  </div>
+  <div id="detail-healthcare"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════ RETAIL ═══════════════════════════════ -->
+<div class="industry-panel" id="ip-retail">
+<div class="main-grid industry-retail">
+  <div class="model-list-card">
+    <div class="model-list-label">Models</div>
+    <button class="model-btn active" onclick="showModel('retail','kmeans',this)">K-Means (RFM)</button>
+    <button class="model-btn" onclick="showModel('retail','collab',this)">Collaborative Filtering</button>
+    <button class="model-btn" onclick="showModel('retail','prophet',this)">Prophet / ARIMA</button>
+    <button class="model-btn" onclick="showModel('retail','xgboost',this)">XGBoost (Churn)</button>
+    <button class="model-btn" onclick="showModel('retail','mf',this)">Matrix Factorization</button>
+  </div>
+  <div id="detail-retail"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════ MANUFACTURING ═══════════════════════════════ -->
+<div class="industry-panel" id="ip-manufacturing">
+<div class="main-grid industry-manufacturing">
+  <div class="model-list-card">
+    <div class="model-list-label">Models</div>
+    <button class="model-btn active" onclick="showModel('manufacturing','isoforest',this)">Isolation Forest</button>
+    <button class="model-btn" onclick="showModel('manufacturing','lstm_ae',this)">LSTM Autoencoder</button>
+    <button class="model-btn" onclick="showModel('manufacturing','rf',this)">Random Forest</button>
+    <button class="model-btn" onclick="showModel('manufacturing','pca',this)">PCA</button>
+    <button class="model-btn" onclick="showModel('manufacturing','svm',this)">SVM</button>
+    <button class="model-btn" onclick="showModel('manufacturing','cnn',this)">CNN (Visual QC)</button>
+  </div>
+  <div id="detail-manufacturing"></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════ TECH / NLP ═══════════════════════════════ -->
+<div class="industry-panel" id="ip-tech">
+<div class="main-grid industry-tech">
+  <div class="model-list-card">
+    <div class="model-list-label">Models</div>
+    <button class="model-btn active" onclick="showModel('tech','bert',this)">Transformers / BERT</button>
+    <button class="model-btn" onclick="showModel('tech','logreg',this)">Logistic Regression</button>
+    <button class="model-btn" onclick="showModel('tech','lgbm',this)">LightGBM (CTR)</button>
+    <button class="model-btn" onclick="showModel('tech','ab',this)">A/B Testing</button>
+    <button class="model-btn" onclick="showModel('tech','collab',this)">Collaborative Filtering</button>
+  </div>
+  <div id="detail-tech"></div>
+</div>
+</div>
+
+</div><!-- /wrapper -->
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+const DATA = {
+
+finance: {
+  xgboost: {
+    title: "XGBoost / LightGBM",
+    desc: "Gradient boosted trees — the go-to for tabular financial data. Handles missing values, imbalanced classes, and gives feature importance out of the box.",
+    questions: [
+      "Will this customer default on their loan?",
+      "What is the probability of credit card delinquency in 90 days?",
+      "Which features drive the default risk most? (SHAP)",
+      "How does the model perform across different income brackets?",
+      "Can we explain a rejection decision to a regulator?"
+    ],
+    metric: "<strong>Key metric:</strong> AUC-ROC + KS statistic. Accuracy is misleading on imbalanced datasets (99% good loans). Use <code>scale_pos_weight</code> to handle class imbalance.",
+    code: `<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+<span class="kw">import</span> shap
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, classification_report
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+
+<span class="cm"># 1. Split — stratify keeps class ratio in both sets</span>
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=<span class="nm">0.2</span>, random_state=<span class="nm">42</span>, stratify=y)
+
+<span class="cm"># 2. Scale</span>
+scaler = StandardScaler()
+X_train = scaler.<span class="fn">fit_transform</span>(X_train)
+X_test  = scaler.<span class="fn">transform</span>(X_test)
+
+<span class="cm"># 3. Train — scale_pos_weight handles class imbalance</span>
+model = xgb.<span class="fn">XGBClassifier</span>(
+    n_estimators=<span class="nm">300</span>, max_depth=<span class="nm">5</span>,
+    learning_rate=<span class="nm">0.05</span>, scale_pos_weight=<span class="nm">10</span>,
+    eval_metric=<span class="st">'logloss'</span>, use_label_encoder=<span class="kw">False</span>)
+model.<span class="fn">fit</span>(X_train, y_train,
+    eval_set=[(X_test, y_test)], early_stopping_rounds=<span class="nm">20</span>, verbose=<span class="kw">False</span>)
+
+<span class="cm"># 4. Evaluate</span>
+y_prob = model.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>]
+<span class="fn">print</span>(<span class="st">f"AUC-ROC: {roc_auc_score(y_test, y_prob):.3f}"</span>)
+<span class="fn">print</span>(classification_report(y_test, model.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># 5. SHAP — required for regulatory explainability</span>
+explainer  = shap.<span class="fn">TreeExplainer</span>(model)
+shap_vals  = explainer.<span class="fn">shap_values</span>(X_test)
+shap.<span class="fn">summary_plot</span>(shap_vals, X_test, feature_names=feature_names)
+shap.<span class="fn">waterfall_plot</span>(explainer(<span class="fn">pd.DataFrame</span>(X_test))[<span class="nm">0</span>])`
+  },
+
+  logreg: {
+    title: "Logistic Regression",
+    desc: "Simple, fast, and fully interpretable. Often used as a baseline or where regulators require transparent scoring models (e.g., FICO-style scorecards).",
+    questions: [
+      "What's the probability this applicant defaults?",
+      "Which variables contribute to the credit score and by how much?",
+      "Can we build a scorecard that a loan officer can use manually?",
+      "Is our model compliant with fair lending laws? (no proxy variables)"
+    ],
+    metric: "<strong>Key metric:</strong> AUC-ROC and Gini coefficient. For scorecards, also check Population Stability Index (PSI) to detect data drift over time.",
+    code: `<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, classification_report
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Pipeline: scale + fit in one step</span>
+pipe = <span class="fn">Pipeline</span>([
+    (<span class="st">'scaler'</span>, StandardScaler()),
+    (<span class="st">'lr'</span>, <span class="fn">LogisticRegression</span>(
+        C=<span class="nm">0.1</span>, class_weight=<span class="st">'balanced'</span>,
+        solver=<span class="st">'lbfgs'</span>, max_iter=<span class="nm">1000</span>))
+])
+pipe.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># 2. Evaluate</span>
+y_prob = pipe.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>]
+<span class="fn">print</span>(<span class="st">f"AUC-ROC: {roc_auc_score(y_test, y_prob):.3f}"</span>)
+<span class="fn">print</span>(classification_report(y_test, pipe.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># 3. Scorecard: convert coefficients to points</span>
+lr       = pipe.named_steps[<span class="st">'lr'</span>]
+coef_df  = <span class="fn">pd.DataFrame</span>({
+    <span class="st">'feature'</span>: feature_names,
+    <span class="st">'coef'</span>: lr.coef_[<span class="nm">0</span>],
+    <span class="st">'odds_ratio'</span>: np.<span class="fn">exp</span>(lr.coef_[<span class="nm">0</span>])
+}).<span class="fn">sort_values</span>(<span class="st">'coef'</span>, ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(coef_df)
+
+<span class="cm"># 4. Gini coefficient (common in banking)</span>
+gini = <span class="nm">2</span> * <span class="fn">roc_auc_score</span>(y_test, y_prob) - <span class="nm">1</span>
+<span class="fn">print</span>(<span class="st">f"Gini: {gini:.3f}"</span>)`
+  },
+
+  isoforest: {
+    title: "Isolation Forest",
+    desc: "Unsupervised anomaly detection — no fraud labels needed. Isolates unusual transactions by randomly partitioning features. Fast and works well on high-dimensional data.",
+    questions: [
+      "Is this transaction fraudulent? (No labeled data available)",
+      "Which transactions are statistical outliers worth reviewing?",
+      "How unusual is this transaction compared to the customer's history?",
+      "Can we flag the top 1% most anomalous transactions for manual review?"
+    ],
+    metric: "<strong>Key metric:</strong> Precision@K — of the top K flagged transactions, how many are real fraud? Set <code>contamination</code> to your expected fraud rate.",
+    code: `<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> IsolationForest
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> precision_score, recall_score, roc_auc_score
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Scale features</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X_transactions)
+
+<span class="cm"># 2. Fit — no labels needed</span>
+iso = <span class="fn">IsolationForest</span>(
+    contamination=<span class="nm">0.01</span>,  <span class="cm"># ~1% expected fraud rate</span>
+    n_estimators=<span class="nm">200</span>,
+    max_samples=<span class="st">'auto'</span>,
+    random_state=<span class="nm">42</span>)
+iso.<span class="fn">fit</span>(X_scaled)
+
+<span class="cm"># 3. Score: lower = more anomalous</span>
+df[<span class="st">'anomaly_score'</span>] = iso.<span class="fn">decision_function</span>(X_scaled)
+df[<span class="st">'is_fraud_flag'</span>] = iso.<span class="fn">predict</span>(X_scaled) == <span class="nm">-1</span>
+
+<span class="cm"># 4. Evaluate against known labels (if available)</span>
+flagged = df[<span class="st">'is_fraud_flag'</span>].<span class="fn">astype</span>(<span class="fn">int</span>)
+<span class="fn">print</span>(<span class="st">f"Precision: {precision_score(y_true, flagged):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Recall:    {recall_score(y_true, flagged):.3f}"</span>)
+
+<span class="cm"># 5. Top-K review queue</span>
+review_queue = df.<span class="fn">nsmallest</span>(<span class="nm">100</span>, <span class="st">'anomaly_score'</span>)[
+    [<span class="st">'transaction_id'</span>, <span class="st">'amount'</span>, <span class="st">'anomaly_score'</span>]]
+<span class="fn">print</span>(review_queue)`
+  },
+
+  lstm: {
+    title: "LSTM",
+    desc: "Long Short-Term Memory — a recurrent neural network for sequential/time-series data. Used for stock price forecasting, transaction sequence modeling, and time-series anomaly detection.",
+    questions: [
+      "What will this asset's price be over the next 5 days?",
+      "Can we detect unusual sequences of transactions over time?",
+      "What is the trend direction for this stock — up or down?",
+      "How do macro events propagate through time-series signals?"
+    ],
+    metric: "<strong>Key metric:</strong> MAE / RMSE for regression. Direction accuracy (did we predict up/down correctly?) is often more useful in trading than raw error.",
+    code: `<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> MinMaxScaler
+<span class="kw">from</span> tensorflow.keras.models <span class="kw">import</span> Sequential
+<span class="kw">from</span> tensorflow.keras.layers <span class="kw">import</span> LSTM, Dense, Dropout
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error
+
+<span class="cm"># 1. Create sequences (look back 60 days, predict next)</span>
+<span class="kw">def</span> <span class="fn">make_sequences</span>(data, lookback=<span class="nm">60</span>):
+    X, y = [], []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(lookback, <span class="fn">len</span>(data)):
+        X.<span class="fn">append</span>(data[i-lookback:i])
+        y.<span class="fn">append</span>(data[i, <span class="nm">0</span>])
+    <span class="kw">return</span> np.<span class="fn">array</span>(X), np.<span class="fn">array</span>(y)
+
+scaler   = <span class="fn">MinMaxScaler</span>()
+data_sc  = scaler.<span class="fn">fit_transform</span>(price_df[[<span class="st">'close'</span>]])
+X, y     = <span class="fn">make_sequences</span>(data_sc, lookback=<span class="nm">60</span>)
+
+<span class="cm"># 2. Build LSTM model</span>
+model = <span class="fn">Sequential</span>([
+    <span class="fn">LSTM</span>(<span class="nm">64</span>, return_sequences=<span class="kw">True</span>, input_shape=(X.shape[<span class="nm">1</span>], X.shape[<span class="nm">2</span>])),
+    <span class="fn">Dropout</span>(<span class="nm">0.2</span>),
+    <span class="fn">LSTM</span>(<span class="nm">32</span>, return_sequences=<span class="kw">False</span>),
+    <span class="fn">Dropout</span>(<span class="nm">0.2</span>),
+    <span class="fn">Dense</span>(<span class="nm">1</span>)
+])
+model.<span class="fn">compile</span>(optimizer=<span class="st">'adam'</span>, loss=<span class="st">'mse'</span>)
+model.<span class="fn">fit</span>(X_train, y_train, epochs=<span class="nm">30</span>,
+    batch_size=<span class="nm">32</span>, validation_split=<span class="nm">0.1</span>, verbose=<span class="nm">1</span>)
+
+<span class="cm"># 3. Predict and inverse-scale back to prices</span>
+y_pred_sc  = model.<span class="fn">predict</span>(X_test)
+y_pred     = scaler.<span class="fn">inverse_transform</span>(y_pred_sc)
+y_actual   = scaler.<span class="fn">inverse_transform</span>(y_test.<span class="fn">reshape</span>(-<span class="nm">1</span>,<span class="nm">1</span>))
+
+<span class="cm"># 4. Evaluate</span>
+mae = <span class="fn">mean_absolute_error</span>(y_actual, y_pred)
+direction_acc = (<span class="fn">np.sign</span>(np.<span class="fn">diff</span>(y_pred.<span class="fn">flatten</span>())) ==
+                 <span class="fn">np.sign</span>(np.<span class="fn">diff</span>(y_actual.<span class="fn">flatten</span>()))).mean()
+<span class="fn">print</span>(<span class="st">f"MAE: {mae:.4f} | Direction Acc: {direction_acc:.3f}"</span>)`
+  },
+
+  kmeans: {
+    title: "K-Means",
+    desc: "Unsupervised clustering — segments customers into behavioral groups based on spending, income, or transaction patterns. No labels required.",
+    questions: [
+      "Which customers share similar spending behaviors?",
+      "How do we group customers for targeted marketing?",
+      "Are there distinct risk tiers in our customer base?",
+      "Which segment is most likely to take on a premium product?"
+    ],
+    metric: "<strong>Key metric:</strong> Silhouette score (clustering quality) + business interpretability. A mathematically perfect cluster that a product team can't name is useless.",
+    code: `<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 1. Build RFM features: Recency, Frequency, Monetary</span>
+rfm = df.<span class="fn">groupby</span>(<span class="st">'customer_id'</span>).<span class="fn">agg</span>(
+    recency=(<span class="st">'days_since_last'</span>, <span class="st">'min'</span>),
+    frequency=(<span class="st">'transaction_id'</span>, <span class="st">'count'</span>),
+    monetary=(<span class="st">'amount'</span>, <span class="st">'sum'</span>)
+)
+
+<span class="cm"># 2. Scale</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(rfm)
+
+<span class="cm"># 3. Elbow method — find optimal K</span>
+inertias = []
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, <span class="nm">11</span>):
+    km = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="nm">42</span>, n_init=<span class="nm">10</span>)
+    km.<span class="fn">fit</span>(X_scaled)
+    inertias.<span class="fn">append</span>(km.inertia_)
+plt.<span class="fn">plot</span>(<span class="fn">range</span>(<span class="nm">2</span>,<span class="nm">11</span>), inertias, <span class="st">'bo-'</span>); plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. Fit final model (assume K=4 from elbow)</span>
+km = <span class="fn">KMeans</span>(n_clusters=<span class="nm">4</span>, random_state=<span class="nm">42</span>, n_init=<span class="nm">10</span>)
+rfm[<span class="st">'segment'</span>] = km.<span class="fn">fit_predict</span>(X_scaled)
+
+<span class="cm"># 5. Evaluate silhouette + profile each segment</span>
+sil = <span class="fn">silhouette_score</span>(X_scaled, rfm[<span class="st">'segment'</span>])
+<span class="fn">print</span>(<span class="st">f"Silhouette: {sil:.3f}"</span>)
+<span class="fn">print</span>(rfm.<span class="fn">groupby</span>(<span class="st">'segment'</span>).<span class="fn">mean</span>().<span class="fn">round</span>(<span class="nm">1</span>))`
+  },
+
+  rf: {
+    title: "Random Forest",
+    desc: "Ensemble of decision trees — robust, handles non-linearity well, and naturally provides feature importance. A strong all-rounder for classification and regression in finance.",
+    questions: [
+      "Will this customer churn in the next quarter?",
+      "Which features most predict loan repayment?",
+      "How do we rank customers by lifetime value?",
+      "Can we flag high-risk accounts before they default?"
+    ],
+    metric: "<strong>Key metric:</strong> AUC-ROC for classification, RMSE for regression. Use <code>class_weight='balanced'</code> for imbalanced datasets. Check OOB score as a free validation signal.",
+    code: `<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> StratifiedKFold, cross_val_score
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, classification_report
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Train with OOB score (free internal validation)</span>
+rf = <span class="fn">RandomForestClassifier</span>(
+    n_estimators=<span class="nm">300</span>, max_depth=<span class="nm">8</span>,
+    class_weight=<span class="st">'balanced'</span>, oob_score=<span class="kw">True</span>,
+    n_jobs=<span class="nm">-1</span>, random_state=<span class="nm">42</span>)
+rf.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="st">f"OOB Score: {rf.oob_score_:.3f}"</span>)
+
+<span class="cm"># 2. Cross-validate</span>
+cv     = <span class="fn">StratifiedKFold</span>(n_splits=<span class="nm">5</span>)
+scores = <span class="fn">cross_val_score</span>(rf, X, y, cv=cv, scoring=<span class="st">'roc_auc'</span>)
+<span class="fn">print</span>(<span class="st">f"CV AUC: {scores.mean():.3f} ± {scores.std():.3f}"</span>)
+
+<span class="cm"># 3. Evaluate on held-out test set</span>
+y_prob = rf.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>]
+<span class="fn">print</span>(<span class="st">f"Test AUC: {roc_auc_score(y_test, y_prob):.3f}"</span>)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, rf.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># 4. Feature importance</span>
+feat_imp = <span class="fn">pd.Series</span>(
+    rf.feature_importances_, index=feature_names
+).<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>)
+<span class="fn">print</span>(feat_imp.<span class="fn">head</span>(<span class="nm">10</span>))`
+  }
+},
+
+healthcare: {
+  rf: {
+    title: "Random Forest",
+    desc: "Robust ensemble model for clinical prediction tasks. Handles mixed data types (labs, vitals, demographics) and provides feature importance doctors can interrogate.",
+    questions: [
+      "Will this patient be readmitted within 30 days?",
+      "Which clinical variables predict readmission most strongly?",
+      "How does the model perform across different age groups?",
+      "Can we explain the prediction to the treating physician?"
+    ],
+    metric: "<strong>Key metric:</strong> Recall/Sensitivity — missing a high-risk patient (false negative) is worse than over-alerting. Use SHAP waterfall plots to explain individual predictions.",
+    code: `<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> StratifiedKFold, cross_val_score
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, confusion_matrix
+<span class="kw">import</span> shap
+
+<span class="cm"># 1. Train</span>
+rf = <span class="fn">RandomForestClassifier</span>(
+    n_estimators=<span class="nm">200</span>, class_weight=<span class="st">'balanced'</span>,
+    max_depth=<span class="nm">8</span>, oob_score=<span class="kw">True</span>, random_state=<span class="nm">42</span>)
+rf.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># 2. Cross-validate (crucial with small hospital datasets)</span>
+cv     = <span class="fn">StratifiedKFold</span>(n_splits=<span class="nm">5</span>)
+scores = <span class="fn">cross_val_score</span>(rf, X, y, cv=cv, scoring=<span class="st">'recall'</span>)
+<span class="fn">print</span>(<span class="st">f"CV Recall: {scores.mean():.3f} ± {scores.std():.3f}"</span>)
+
+<span class="cm"># 3. Confusion matrix — focus on false negatives</span>
+cm = <span class="fn">confusion_matrix</span>(y_test, rf.<span class="fn">predict</span>(X_test))
+tn, fp, fn, tp = cm.<span class="fn">ravel</span>()
+<span class="fn">print</span>(<span class="st">f"FN (missed readmissions): {fn}"</span>)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, rf.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># 4. SHAP for clinical explainability</span>
+explainer = shap.<span class="fn">TreeExplainer</span>(rf)
+shap_vals = explainer.<span class="fn">shap_values</span>(X_test)
+shap.<span class="fn">summary_plot</span>(shap_vals[<span class="nm">1</span>], X_test, feature_names=feature_names)
+
+<span class="cm"># Explain a single patient's prediction</span>
+shap.<span class="fn">waterfall_plot</span>(explainer(X_test)[<span class="nm">0</span>])`
+  },
+
+  logreg: {
+    title: "Logistic Regression",
+    desc: "The interpretable baseline. Widely used when clinicians need to understand and trust the model. Often the first model built before considering complex alternatives.",
+    questions: [
+      "What are the independent risk factors for this condition?",
+      "How does each lab value contribute to the risk score?",
+      "Can we publish this model in a clinical journal? (requires interpretability)",
+      "Does the model show any demographic bias?"
+    ],
+    metric: "<strong>Key metric:</strong> C-statistic (same as AUC-ROC in clinical literature). Also report calibration — a model saying '80% risk' should be right ~80% of the time.",
+    code: `<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.calibration <span class="kw">import</span> CalibratedClassifierCV, calibration_curve
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Train</span>
+lr = <span class="fn">LogisticRegression</span>(
+    C=<span class="nm">1.0</span>, class_weight=<span class="st">'balanced'</span>, max_iter=<span class="nm">1000</span>)
+lr.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># 2. Calibrate — clinical risk scores must be well-calibrated</span>
+calibrated = <span class="fn">CalibratedClassifierCV</span>(lr, method=<span class="st">'isotonic'</span>, cv=<span class="nm">5</span>)
+calibrated.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># 3. Calibration plot</span>
+prob_true, prob_pred = <span class="fn">calibration_curve</span>(
+    y_test, calibrated.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>], n_bins=<span class="nm">10</span>)
+plt.<span class="fn">plot</span>(prob_pred, prob_true, <span class="st">'s-'</span>, label=<span class="st">'Model'</span>)
+plt.<span class="fn">plot</span>([<span class="nm">0</span>,<span class="nm">1</span>], [<span class="nm">0</span>,<span class="nm">1</span>], <span class="st">'k--'</span>, label=<span class="st">'Perfect calibration'</span>)
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. C-statistic</span>
+c_stat = <span class="fn">roc_auc_score</span>(
+    y_test, calibrated.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>])
+<span class="fn">print</span>(<span class="st">f"C-statistic: {c_stat:.3f}"</span>)
+
+<span class="cm"># 5. Odds ratios for clinical interpretation</span>
+<span class="fn">print</span>(np.<span class="fn">exp</span>(lr.coef_[<span class="nm">0</span>]))`
+  },
+
+  cnn: {
+    title: "CNN (Medical Imaging)",
+    desc: "Convolutional Neural Networks for image classification — X-rays, CT scans, histology slides, retinal images. Usually fine-tuned from a pretrained backbone (ResNet, EfficientNet).",
+    questions: [
+      "Does this chest X-ray show signs of pneumonia or COVID-19?",
+      "Is this skin lesion malignant or benign?",
+      "Can we detect diabetic retinopathy from a fundus image?",
+      "How confident is the model, and what region is it looking at? (Grad-CAM)"
+    ],
+    metric: "<strong>Key metric:</strong> Sensitivity and Specificity. Use ROC curve to find the operating threshold. Always visualize with Grad-CAM — radiologists need to see what the model 'sees'.",
+    code: `<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">from</span> torchvision <span class="kw">import</span> models, transforms
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, classification_report
+
+<span class="cm"># 1. Fine-tune ResNet50 on medical images</span>
+model = models.<span class="fn">resnet50</span>(pretrained=<span class="kw">True</span>)
+model.fc = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Dropout</span>(<span class="nm">0.4</span>),
+    nn.<span class="fn">Linear</span>(model.fc.in_features, <span class="nm">2</span>)  <span class="cm"># binary: normal / abnormal</span>
+)
+device = <span class="st">'cuda'</span> <span class="kw">if</span> torch.cuda.<span class="fn">is_available</span>() <span class="kw">else</span> <span class="st">'cpu'</span>
+model = model.<span class="fn">to</span>(device)
+
+<span class="cm"># 2. Class-weighted loss (medical datasets are imbalanced)</span>
+criterion  = nn.<span class="fn">CrossEntropyLoss</span>(weight=torch.<span class="fn">tensor</span>([<span class="nm">1.0</span>, <span class="nm">3.0</span>]).<span class="fn">to</span>(device))
+optimizer  = torch.optim.<span class="fn">Adam</span>(model.parameters(), lr=<span class="nm">1e-4</span>)
+scheduler  = torch.optim.lr_scheduler.<span class="fn">StepLR</span>(optimizer, step_size=<span class="nm">5</span>, gamma=<span class="nm">0.5</span>)
+
+<span class="cm"># 3. Training loop (simplified)</span>
+<span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">20</span>):
+    model.<span class="fn">train</span>()
+    <span class="kw">for</span> imgs, labels <span class="kw">in</span> train_loader:
+        imgs, labels = imgs.<span class="fn">to</span>(device), labels.<span class="fn">to</span>(device)
+        loss = <span class="fn">criterion</span>(<span class="fn">model</span>(imgs), labels)
+        optimizer.<span class="fn">zero_grad</span>(); loss.<span class="fn">backward</span>(); optimizer.<span class="fn">step</span>()
+    scheduler.<span class="fn">step</span>()
+
+<span class="cm"># 4. Evaluate — AUC + sensitivity/specificity</span>
+model.<span class="fn">eval</span>()
+<span class="kw">with</span> torch.<span class="fn">no_grad</span>():
+    probs = torch.nn.functional.<span class="fn">softmax</span>(<span class="fn">model</span>(X_test.<span class="fn">to</span>(device)), dim=<span class="nm">1</span>)[:, <span class="nm">1</span>]
+auc = <span class="fn">roc_auc_score</span>(y_test, probs.<span class="fn">cpu</span>().<span class="fn">numpy</span>())
+<span class="fn">print</span>(<span class="st">f"AUC: {auc:.3f}"</span>)
+<span class="cm"># Use Grad-CAM to visualize which region the model focused on</span>`
+  },
+
+  cox: {
+    title: "Cox Survival Model",
+    desc: "Models time-to-event data — not just whether something will happen, but *when*. Essential for patient survival analysis, time-to-discharge, or disease progression.",
+    questions: [
+      "What is the expected survival time after this cancer diagnosis?",
+      "Which variables most accelerate or delay disease progression?",
+      "What is the probability that this patient survives 5 years?",
+      "How do treatment groups compare over time? (Kaplan-Meier)"
+    ],
+    metric: "<strong>Key metric:</strong> C-index (concordance index) — like AUC but for survival data. Also plot Kaplan-Meier survival curves to visually compare groups.",
+    code: `<span class="kw">from</span> lifelines <span class="kw">import</span> CoxPHFitter, KaplanMeierFitter
+<span class="kw">from</span> lifelines.statistics <span class="kw">import</span> logrank_test
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># df must have: duration (time), event (1=died/0=censored), + covariates</span>
+
+<span class="cm"># 1. Kaplan-Meier by treatment group</span>
+kmf = <span class="fn">KaplanMeierFitter</span>()
+<span class="kw">for</span> group, gdf <span class="kw">in</span> df.<span class="fn">groupby</span>(<span class="st">'treatment'</span>):
+    kmf.<span class="fn">fit</span>(gdf[<span class="st">'duration'</span>], gdf[<span class="st">'event'</span>], label=group)
+    kmf.<span class="fn">plot_survival_function</span>()
+plt.<span class="fn">title</span>(<span class="st">'Kaplan-Meier Survival Curves'</span>); plt.<span class="fn">show</span>()
+
+<span class="cm"># 2. Log-rank test — are the curves significantly different?</span>
+grp_a = df[df[<span class="st">'treatment'</span>]==<span class="st">'A'</span>]
+grp_b = df[df[<span class="st">'treatment'</span>]==<span class="st">'B'</span>]
+result = <span class="fn">logrank_test</span>(
+    grp_a[<span class="st">'duration'</span>], grp_b[<span class="st">'duration'</span>],
+    grp_a[<span class="st">'event'</span>],   grp_b[<span class="st">'event'</span>])
+<span class="fn">print</span>(<span class="st">f"p-value: {result.p_value:.4f}"</span>)
+
+<span class="cm"># 3. Cox proportional hazards model</span>
+cph = <span class="fn">CoxPHFitter</span>(penalizer=<span class="nm">0.1</span>)
+cph.<span class="fn">fit</span>(df, duration_col=<span class="st">'duration'</span>, event_col=<span class="st">'event'</span>)
+cph.<span class="fn">print_summary</span>()          <span class="cm"># hazard ratios + p-values</span>
+<span class="fn">print</span>(<span class="st">f"C-index: {cph.concordance_index_:.3f}"</span>)
+
+<span class="cm"># 4. Predict survival for a new patient</span>
+new_patient = pd.<span class="fn">DataFrame</span>({<span class="st">'age'</span>: [<span class="nm">65</span>], <span class="st">'stage'</span>: [<span class="nm">3</span>], <span class="st">'treatment'</span>: [<span class="st">'B'</span>]})
+cph.<span class="fn">predict_survival_function</span>(new_patient).<span class="fn">plot</span>()</pre>`
+  },
+
+  xgboost: {
+    title: "XGBoost (Healthcare)",
+    desc: "Powerful gradient boosting for structured EHR (Electronic Health Record) data. Handles mixed types, missing labs, and produces probabilities usable in clinical alert systems.",
+    questions: [
+      "Which ICU patients are at risk of sepsis in the next 6 hours?",
+      "Can we predict length of hospital stay from admission features?",
+      "Which lab values are the strongest early warning signals?",
+      "How do we set the alert threshold to minimize missed cases?"
+    ],
+    metric: "<strong>Key metric:</strong> AUROC + Recall at a fixed alert rate. In sepsis prediction, a 2-hour lead time with 70% recall is more valuable than 95% accuracy that alerts too late.",
+    code: `<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+<span class="kw">import</span> shap
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, precision_recall_curve
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 1. Train on EHR features (labs, vitals, demographics)</span>
+model = xgb.<span class="fn">XGBClassifier</span>(
+    n_estimators=<span class="nm">400</span>, max_depth=<span class="nm">4</span>,
+    learning_rate=<span class="nm">0.03</span>, subsample=<span class="nm">0.8</span>,
+    scale_pos_weight=<span class="nm">15</span>,  <span class="cm"># sepsis is rare</span>
+    eval_metric=<span class="st">'aucpr'</span>,  <span class="cm"># PR-AUC better for rare events</span>
+    use_label_encoder=<span class="kw">False</span>)
+model.<span class="fn">fit</span>(X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    early_stopping_rounds=<span class="nm">30</span>, verbose=<span class="kw">False</span>)
+
+<span class="cm"># 2. Evaluate</span>
+y_prob = model.<span class="fn">predict_proba</span>(X_test)[:, <span class="nm">1</span>]
+<span class="fn">print</span>(<span class="st">f"AUROC: {roc_auc_score(y_test, y_prob):.3f}"</span>)
+
+<span class="cm"># 3. Choose threshold for clinical alert system</span>
+prec, rec, thresholds = <span class="fn">precision_recall_curve</span>(y_test, y_prob)
+<span class="cm"># Pick threshold where recall >= 0.75</span>
+target = [(p,r,t) <span class="kw">for</span> p,r,t <span class="kw">in</span> <span class="fn">zip</span>(prec,rec,thresholds) <span class="kw">if</span> r >= <span class="nm">0.75</span>]
+best = <span class="fn">max</span>(target, key=<span class="kw">lambda</span> x: x[<span class="nm">0</span>])
+<span class="fn">print</span>(<span class="st">f"Threshold: {best[2]:.3f} | P: {best[0]:.2f} | R: {best[1]:.2f}"</span>)
+
+<span class="cm"># 4. SHAP — explain each alert to the clinical team</span>
+explainer = shap.<span class="fn">TreeExplainer</span>(model)
+shap.<span class="fn">summary_plot</span>(explainer.<span class="fn">shap_values</span>(X_test), X_test)`
+  },
+
+  bert: {
+    title: "BERT (Clinical NLP)",
+    desc: "Transformer model fine-tuned for clinical text — discharge summaries, nursing notes, radiology reports. Extracts diagnoses, medications, risk factors from unstructured text.",
+    questions: [
+      "What diagnosis codes (ICD-10) are implied in this discharge note?",
+      "Is there mention of a fall risk or pressure injury in these nursing notes?",
+      "Can we extract medication names and dosages automatically?",
+      "Does this radiology report indicate a finding that needs follow-up?"
+    ],
+    metric: "<strong>Key metric:</strong> Token-level F1 for NER tasks. Document-level F1 for classification. Clinical models need high precision — false extractions can harm downstream care.",
+    code: `<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+<span class="kw">import</span> torch
+
+<span class="cm"># 1. Use a clinical BERT (pretrained on medical text)</span>
+model_name = <span class="st">'emilyalsentzer/Bio_ClinicalBERT'</span>
+tokenizer  = AutoTokenizer.<span class="fn">from_pretrained</span>(model_name)
+model      = AutoModelForSequenceClassification.<span class="fn">from_pretrained</span>(
+    model_name, num_labels=<span class="nm">2</span>)
+
+<span class="cm"># 2. Tokenize clinical notes</span>
+<span class="kw">def</span> <span class="fn">tokenize</span>(batch):
+    <span class="kw">return</span> <span class="fn">tokenizer</span>(batch[<span class="st">'text'</span>], truncation=<span class="kw">True</span>,
+        padding=<span class="st">'max_length'</span>, max_length=<span class="nm">512</span>)
+
+train_ds = train_ds.<span class="fn">map</span>(tokenize, batched=<span class="kw">True</span>)
+val_ds   = val_ds.<span class="fn">map</span>(tokenize, batched=<span class="kw">True</span>)
+
+<span class="cm"># 3. Fine-tune with Hugging Face Trainer</span>
+args = <span class="fn">TrainingArguments</span>(
+    output_dir=<span class="st">'./clinical-bert'</span>,
+    num_train_epochs=<span class="nm">4</span>, per_device_train_batch_size=<span class="nm">8</span>,
+    learning_rate=<span class="nm">2e-5</span>, weight_decay=<span class="nm">0.01</span>,
+    evaluation_strategy=<span class="st">'epoch'</span>, load_best_model_at_end=<span class="kw">True</span>)
+trainer = <span class="fn">Trainer</span>(model=model, args=args,
+    train_dataset=train_ds, eval_dataset=val_ds)
+trainer.<span class="fn">train</span>()
+
+<span class="cm"># 4. Evaluate</span>
+preds = trainer.<span class="fn">predict</span>(test_ds)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(
+    y_test, preds.predictions.<span class="fn">argmax</span>(-<span class="nm">1</span>)))`
+  }
+},
+
+retail: {
+  kmeans: {
+    title: "K-Means (RFM Segmentation)",
+    desc: "Groups customers by Recency, Frequency, and Monetary value. The backbone of customer segmentation — tells you who your champions, loyalists, and at-risk customers are.",
+    questions: [
+      "How do we group customers for targeted email campaigns?",
+      "Who are our most valuable customers right now?",
+      "Which customers haven't bought recently and need re-engagement?",
+      "How many distinct customer personas does our database actually contain?"
+    ],
+    metric: "<strong>Key metric:</strong> Silhouette score (cluster quality) + business naming test. Each cluster should have a clear, marketable persona (e.g. 'VIP loyalists', 'One-time buyers').",
+    code: `<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Build RFM features from transaction data</span>
+snapshot = df[<span class="st">'date'</span>].<span class="fn">max</span>() + pd.<span class="fn">Timedelta</span>(days=<span class="nm">1</span>)
+rfm = df.<span class="fn">groupby</span>(<span class="st">'customer_id'</span>).<span class="fn">agg</span>(
+    recency  = (<span class="st">'date'</span>,   <span class="kw">lambda</span> x: (snapshot - x.<span class="fn">max</span>()).days),
+    frequency= (<span class="st">'order_id'</span>, <span class="st">'count'</span>),
+    monetary = (<span class="st">'revenue'</span>, <span class="st">'sum'</span>)
+)
+
+<span class="cm"># 2. Log-transform monetary to reduce skew</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+rfm[<span class="st">'monetary_log'</span>] = np.<span class="fn">log1p</span>(rfm[<span class="st">'monetary'</span>])
+
+<span class="cm"># 3. Scale + find K via elbow</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(rfm[[<span class="st">'recency'</span>,<span class="st">'frequency'</span>,<span class="st">'monetary_log'</span>]])
+inertias = [<span class="fn">KMeans</span>(n_clusters=k, n_init=<span class="nm">10</span>).<span class="fn">fit</span>(X_scaled).inertia_
+            <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>,<span class="nm">9</span>)]
+
+<span class="cm"># 4. Fit final model</span>
+km = <span class="fn">KMeans</span>(n_clusters=<span class="nm">5</span>, n_init=<span class="nm">10</span>, random_state=<span class="nm">42</span>)
+rfm[<span class="st">'segment'</span>] = km.<span class="fn">fit_predict</span>(X_scaled)
+sil = <span class="fn">silhouette_score</span>(X_scaled, rfm[<span class="st">'segment'</span>])
+<span class="fn">print</span>(<span class="st">f"Silhouette: {sil:.3f}"</span>)
+
+<span class="cm"># 5. Profile each segment</span>
+<span class="fn">print</span>(rfm.<span class="fn">groupby</span>(<span class="st">'segment'</span>)[
+    [<span class="st">'recency'</span>,<span class="st">'frequency'</span>,<span class="st">'monetary'</span>]].<span class="fn">mean</span>().<span class="fn">round</span>(<span class="nm">1</span>))`
+  },
+
+  collab: {
+    title: "Collaborative Filtering",
+    desc: "Recommends products based on what similar users liked. The core of 'customers who bought X also bought Y'. Uses user-item interaction matrices.",
+    questions: [
+      "What products should we recommend to this customer?",
+      "Which items are frequently bought together? (market basket)",
+      "Can we recommend to brand-new users with no history? (cold start)",
+      "How do we measure if recommendations actually drive sales?"
+    ],
+    metric: "<strong>Key metric:</strong> Precision@K and NDCG@K — of the top K recommended items, how many did the user actually buy? Offline metrics should be validated with A/B tests.",
+    code: `<span class="kw">from</span> surprise <span class="kw">import</span> SVD, Dataset, Reader
+<span class="kw">from</span> surprise.model_selection <span class="kw">import</span> cross_validate
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Load ratings (customer_id, product_id, purchase_count)</span>
+reader  = <span class="fn">Reader</span>(rating_scale=(<span class="nm">1</span>, <span class="nm">5</span>))
+data    = Dataset.<span class="fn">load_from_df</span>(
+    df[[<span class="st">'customer_id'</span>, <span class="st">'product_id'</span>, <span class="st">'rating'</span>]], reader)
+
+<span class="cm"># 2. Matrix Factorization with SVD</span>
+algo = <span class="fn">SVD</span>(n_factors=<span class="nm">50</span>, n_epochs=<span class="nm">20</span>, lr_all=<span class="nm">0.005</span>, reg_all=<span class="nm">0.02</span>)
+results = <span class="fn">cross_validate</span>(algo, data, measures=[<span class="st">'RMSE'</span>, <span class="st">'MAE'</span>], cv=<span class="nm">5</span>)
+<span class="fn">print</span>(<span class="st">f"RMSE: {results['test_rmse'].mean():.3f}"</span>)
+
+<span class="cm"># 3. Precision@K evaluation</span>
+<span class="kw">def</span> <span class="fn">precision_at_k</span>(predictions, k=<span class="nm">10</span>, threshold=<span class="nm">3.5</span>):
+    user_est = defaultdict(<span class="fn">list</span>)
+    <span class="kw">for</span> uid, _, true_r, est, _ <span class="kw">in</span> predictions:
+        user_est[uid].<span class="fn">append</span>((est, true_r))
+    precisions = {}
+    <span class="kw">for</span> uid, user_ratings <span class="kw">in</span> user_est.<span class="fn">items</span>():
+        user_ratings.<span class="fn">sort</span>(key=<span class="kw">lambda</span> x: x[<span class="nm">0</span>], reverse=<span class="kw">True</span>)
+        n_rel_and_rec = <span class="fn">sum</span>((t >= threshold) <span class="kw">for</span> _, t <span class="kw">in</span> user_ratings[:k])
+        precisions[uid] = n_rel_and_rec / k
+    <span class="kw">return</span> <span class="fn">sum</span>(precisions.<span class="fn">values</span>()) / <span class="fn">len</span>(precisions)
+
+<span class="cm"># 4. Get top-N recommendations for a user</span>
+trainset = data.<span class="fn">build_full_trainset</span>()
+algo.<span class="fn">fit</span>(trainset)
+all_items  = trainset.<span class="fn">all_items</span>()
+user_recs  = [(iid, algo.<span class="fn">predict</span>(<span class="st">'user_42'</span>, trainset.<span class="fn">to_raw_iid</span>(iid)).est)
+              <span class="kw">for</span> iid <span class="kw">in</span> all_items]
+top10 = <span class="fn">sorted</span>(user_recs, key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>], reverse=<span class="kw">True</span>)[:<span class="nm">10</span>]`
+  },
+
+  prophet: {
+    title: "Prophet / ARIMA",
+    desc: "Time-series forecasting for demand and inventory planning. Prophet handles seasonality, holidays, and missing data automatically. ARIMA is the statistical baseline.",
+    questions: [
+      "How much inventory do we need for next month?",
+      "What will sales look like over the holiday season?",
+      "How did a promotion affect baseline demand?",
+      "Where are the demand peaks we need to staff for?"
+    ],
+    metric: "<strong>Key metric:</strong> MAPE (Mean Absolute Percentage Error) and MAE. For inventory, also track how often you go out of stock vs. overstock.",
+    code: `<span class="kw">from</span> prophet <span class="kw">import</span> Prophet
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> mean_absolute_error
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Prophet needs columns: 'ds' (date) and 'y' (value)</span>
+df_prophet = daily_sales.<span class="fn">rename</span>(columns={<span class="st">'date'</span>:<span class="st">'ds'</span>, <span class="st">'sales'</span>:<span class="st">'y'</span>})
+
+<span class="cm"># 2. Fit — add country holidays automatically</span>
+m = <span class="fn">Prophet</span>(
+    yearly_seasonality=<span class="kw">True</span>,
+    weekly_seasonality=<span class="kw">True</span>,
+    daily_seasonality=<span class="kw">False</span>,
+    seasonality_mode=<span class="st">'multiplicative'</span>)
+m.<span class="fn">add_country_holidays</span>(country_name=<span class="st">'US'</span>)
+m.<span class="fn">fit</span>(df_prophet[df_prophet[<span class="st">'ds'</span>] < test_start])
+
+<span class="cm"># 3. Forecast 90 days ahead</span>
+future   = m.<span class="fn">make_future_dataframe</span>(periods=<span class="nm">90</span>)
+forecast = m.<span class="fn">predict</span>(future)
+m.<span class="fn">plot</span>(forecast); m.<span class="fn">plot_components</span>(forecast)
+
+<span class="cm"># 4. Evaluate on held-out period</span>
+actuals   = df_prophet[df_prophet[<span class="st">'ds'</span>] >= test_start][<span class="st">'y'</span>]
+predicted = forecast[forecast[<span class="st">'ds'</span>] >= test_start][<span class="st">'yhat'</span>]
+mae  = <span class="fn">mean_absolute_error</span>(actuals, predicted)
+mape = (np.<span class="fn">abs</span>((actuals.values - predicted.values) / actuals.values)).<span class="fn">mean</span>()
+<span class="fn">print</span>(<span class="st">f"MAE: {mae:.1f} | MAPE: {mape*100:.1f}%"</span>)`
+  },
+
+  xgboost: {
+    title: "XGBoost (Churn Prediction)",
+    desc: "Predicts which customers are about to stop buying. Trained on behavioral features — days since last purchase, order frequency, email engagement, support tickets.",
+    questions: [
+      "Which customers are likely to churn in the next 30 days?",
+      "What behaviors most predict churn? (so we can act earlier)",
+      "How do we rank customers for a re-engagement campaign?",
+      "What's the ROI of retaining a churned customer vs acquiring a new one?"
+    ],
+    metric: "<strong>Key metric:</strong> Precision@K for outreach — you can only call N customers, so who are the top N most likely to churn? Also track lift over random.",
+    code: `<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+<span class="kw">import</span> shap
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, precision_score
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Features: behavioral signals</span>
+<span class="cm">#    days_since_last_purchase, order_count_90d, avg_order_value,</span>
+<span class="cm">#    email_open_rate, returns_count, support_tickets, etc.</span>
+
+<span class="cm"># 2. Train</span>
+model = xgb.<span class="fn">XGBClassifier</span>(
+    n_estimators=<span class="nm">350</span>, max_depth=<span class="nm">4</span>,
+    learning_rate=<span class="nm">0.04</span>, subsample=<span class="nm">0.8</span>,
+    colsample_bytree=<span class="nm">0.8</span>, scale_pos_weight=<span class="nm">8</span>,
+    use_label_encoder=<span class="kw">False</span>, eval_metric=<span class="st">'aucpr'</span>)
+model.<span class="fn">fit</span>(X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    early_stopping_rounds=<span class="nm">25</span>, verbose=<span class="kw">False</span>)
+
+<span class="cm"># 3. Score all active customers</span>
+df[<span class="st">'churn_prob'</span>] = model.<span class="fn">predict_proba</span>(X_all)[:, <span class="nm">1</span>]
+
+<span class="cm"># 4. Precision@K — top 500 for outreach campaign</span>
+top500 = df.<span class="fn">nlargest</span>(<span class="nm">500</span>, <span class="st">'churn_prob'</span>)
+p_at_k = <span class="fn">precision_score</span>(
+    top500[<span class="st">'actual_churned'</span>], top500[<span class="st">'churn_prob'</span>] > <span class="nm">0.5</span>)
+<span class="fn">print</span>(<span class="st">f"Precision@500: {p_at_k:.3f}"</span>)
+
+<span class="cm"># 5. SHAP — why is this customer flagged?</span>
+explainer = shap.<span class="fn">TreeExplainer</span>(model)
+shap.<span class="fn">waterfall_plot</span>(explainer(X_test)[<span class="nm">0</span>])`
+  },
+
+  mf: {
+    title: "Matrix Factorization",
+    desc: "Decomposes the user-item interaction matrix into latent factors. Lower-level building block behind collaborative filtering — used when you need full control over the embedding representations.",
+    questions: [
+      "Can we learn customer 'taste vectors' for downstream tasks?",
+      "How similar are two products based on user behavior?",
+      "Can we handle millions of users efficiently?",
+      "Which users and products have the most similar latent profiles?"
+    ],
+    metric: "<strong>Key metric:</strong> RMSE on held-out ratings + Precision@K for top-N recommendations. Watch for popularity bias — the model may over-recommend bestsellers.",
+    code: `<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> scipy.sparse <span class="kw">import</span> csr_matrix
+<span class="kw">from</span> sklearn.metrics.pairwise <span class="kw">import</span> cosine_similarity
+<span class="kw">from</span> implicit <span class="kw">import</span> als  <span class="cm"># fast ALS for implicit feedback</span>
+
+<span class="cm"># 1. Build sparse user-item matrix (implicit: views/clicks/purchases)</span>
+user_item = <span class="fn">csr_matrix</span>(
+    (df[<span class="st">'purchase_count'</span>], (df[<span class="st">'user_idx'</span>], df[<span class="st">'item_idx'</span>])))
+
+<span class="cm"># 2. Alternating Least Squares (fast, scales to millions)</span>
+model = als.<span class="fn">AlternatingLeastSquares</span>(
+    factors=<span class="nm">64</span>, regularization=<span class="nm">0.1</span>, iterations=<span class="nm">50</span>)
+model.<span class="fn">fit</span>(user_item)
+
+<span class="cm"># 3. Recommend top-10 items for a user</span>
+user_id = <span class="nm">42</span>
+recs, scores = model.<span class="fn">recommend</span>(
+    user_id, user_item[user_id], N=<span class="nm">10</span>, filter_already_liked_items=<span class="kw">True</span>)
+<span class="fn">print</span>(recs, scores)
+
+<span class="cm"># 4. Find similar products using item embeddings</span>
+item_factors = model.item_factors
+sims = <span class="fn">cosine_similarity</span>(item_factors[[target_item_id]], item_factors)
+top_similar = np.<span class="fn">argsort</span>(sims[<span class="nm">0</span>])[::-<span class="nm">1</span>][<span class="nm">1</span>:<span class="nm">11</span>]
+<span class="fn">print</span>(<span class="st">"Similar items:"</span>, top_similar)`
+  }
+},
+
+manufacturing: {
+  isoforest: {
+    title: "Isolation Forest",
+    desc: "Unsupervised anomaly detection on sensor data. Isolates unusual readings without needing labeled failure examples — ideal when failures are rare and unlabeled.",
+    questions: [
+      "Which sensor readings indicate an anomaly right now?",
+      "Can we flag unusual machine behavior before a failure?",
+      "How do we set a threshold to trigger a maintenance alert?",
+      "Which sensors contribute most to the anomaly score?"
+    ],
+    metric: "<strong>Key metric:</strong> Precision (don't cry wolf) and Recall (don't miss real failures). Tune <code>contamination</code> to match your known failure rate.",
+    code: `<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> IsolationForest
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> precision_score, recall_score
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Scale sensor readings</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(sensor_df[feature_cols])
+
+<span class="cm"># 2. Fit — unsupervised, no labels needed</span>
+iso = <span class="fn">IsolationForest</span>(
+    contamination=<span class="nm">0.03</span>,  <span class="cm"># expect 3% anomaly rate</span>
+    n_estimators=<span class="nm">300</span>, max_samples=<span class="st">'auto'</span>,
+    random_state=<span class="nm">42</span>, n_jobs=<span class="nm">-1</span>)
+iso.<span class="fn">fit</span>(X_scaled)
+
+<span class="cm"># 3. Score: lower = more anomalous</span>
+sensor_df[<span class="st">'anomaly_score'</span>] = iso.<span class="fn">decision_function</span>(X_scaled)
+sensor_df[<span class="st">'is_anomaly'</span>]    = iso.<span class="fn">predict</span>(X_scaled) == <span class="nm">-1</span>
+
+<span class="cm"># 4. Evaluate against known failure labels</span>
+flagged = sensor_df[<span class="st">'is_anomaly'</span>].<span class="fn">astype</span>(<span class="fn">int</span>)
+<span class="fn">print</span>(<span class="st">f"Precision: {precision_score(failure_labels, flagged):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Recall:    {recall_score(failure_labels, flagged):.3f}"</span>)
+
+<span class="cm"># 5. Real-time scoring (stream new readings through scaler)</span>
+new_reading  = scaler.<span class="fn">transform</span>(live_sensor_data)
+alert        = iso.<span class="fn">predict</span>(new_reading)[<span class="nm">0</span>] == <span class="nm">-1</span>
+<span class="fn">print</span>(<span class="st">f"ALERT: {alert}"</span>)`
+  },
+
+  lstm_ae: {
+    title: "LSTM Autoencoder",
+    desc: "Learns 'normal' machine behavior from sequences of sensor readings, then flags sequences with high reconstruction error as anomalies. Better at temporal patterns than Isolation Forest.",
+    questions: [
+      "Can we detect gradual machine degradation over time?",
+      "What does a 'normal' 24-hour sensor pattern look like?",
+      "How far in advance can we detect bearing failure?",
+      "Which time windows show unusual behavior?"
+    ],
+    metric: "<strong>Key metric:</strong> Reconstruction error threshold — pick a threshold on the validation set that gives acceptable precision/recall tradeoff. Monitor error trend, not just threshold crossings.",
+    code: `<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> tensorflow.keras.models <span class="kw">import</span> Model
+<span class="kw">from</span> tensorflow.keras.layers <span class="kw">import</span> Input, LSTM, RepeatVector, TimeDistributed, Dense
+
+<span class="cm"># 1. Build sliding window sequences from sensor data</span>
+<span class="kw">def</span> <span class="fn">make_windows</span>(data, window=<span class="nm">60</span>):
+    <span class="kw">return</span> np.<span class="fn">array</span>([data[i:i+window] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(data)-window)])
+X_seq = <span class="fn">make_windows</span>(X_scaled, window=<span class="nm">60</span>)
+
+<span class="cm"># 2. LSTM Autoencoder: encode → compress → decode</span>
+inputs  = <span class="fn">Input</span>(shape=(X_seq.shape[<span class="nm">1</span>], X_seq.shape[<span class="nm">2</span>]))
+encoded = <span class="fn">LSTM</span>(<span class="nm">32</span>, activation=<span class="st">'relu'</span>)(inputs)
+decoded = <span class="fn">RepeatVector</span>(X_seq.shape[<span class="nm">1</span>])(encoded)
+decoded = <span class="fn">LSTM</span>(<span class="nm">32</span>, activation=<span class="st">'relu'</span>, return_sequences=<span class="kw">True</span>)(decoded)
+output  = <span class="fn">TimeDistributed</span>(<span class="fn">Dense</span>(X_seq.shape[<span class="nm">2</span>]))(decoded)
+ae = <span class="fn">Model</span>(inputs, output)
+ae.<span class="fn">compile</span>(optimizer=<span class="st">'adam'</span>, loss=<span class="st">'mse'</span>)
+
+<span class="cm"># 3. Train on NORMAL data only</span>
+ae.<span class="fn">fit</span>(X_normal, X_normal, epochs=<span class="nm">50</span>,
+    batch_size=<span class="nm">64</span>, validation_split=<span class="nm">0.1</span>, verbose=<span class="nm">1</span>)
+
+<span class="cm"># 4. Reconstruction error = anomaly score</span>
+X_pred  = ae.<span class="fn">predict</span>(X_seq)
+rec_err = np.<span class="fn">mean</span>(np.<span class="fn">abs</span>(X_seq - X_pred), axis=(<span class="nm">1</span>,<span class="nm">2</span>))
+
+<span class="cm"># 5. Threshold from normal baseline (e.g. 99th percentile)</span>
+threshold    = np.<span class="fn">percentile</span>(rec_err_normal, <span class="nm">99</span>)
+anomalies    = rec_err > threshold
+<span class="fn">print</span>(<span class="st">f"Anomalies detected: {anomalies.sum()}"</span>)`
+  },
+
+  rf: {
+    title: "Random Forest (Fault Classification)",
+    desc: "When you have labeled failure types, Random Forest classifies which type of fault is occurring — bearing wear, overheating, misalignment. Great for multi-class fault diagnosis.",
+    questions: [
+      "Which type of fault is occurring — bearing, belt, or motor?",
+      "Which sensor channels are the strongest fault indicators?",
+      "How confident is the model about this fault classification?",
+      "Can we predict fault type before a complete failure occurs?"
+    ],
+    metric: "<strong>Key metric:</strong> Per-class F1 score. Some fault types are rarer — macro-F1 is fairer than accuracy. Confusion matrix reveals which faults get confused with each other.",
+    code: `<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, confusion_matrix, ConfusionMatrixDisplay
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 1. Multi-class: 0=normal, 1=bearing, 2=overheating, 3=misalignment</span>
+rf = <span class="fn">RandomForestClassifier</span>(
+    n_estimators=<span class="nm">300</span>, class_weight=<span class="st">'balanced'</span>,
+    max_depth=<span class="nm">10</span>, oob_score=<span class="kw">True</span>,
+    n_jobs=<span class="nm">-1</span>, random_state=<span class="nm">42</span>)
+rf.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="st">f"OOB: {rf.oob_score_:.3f}"</span>)
+
+<span class="cm"># 2. Evaluate — per-class F1</span>
+<span class="fn">print</span>(<span class="fn">classification_report</span>(
+    y_test, rf.<span class="fn">predict</span>(X_test),
+    target_names=[<span class="st">'normal'</span>, <span class="st">'bearing'</span>, <span class="st">'overheat'</span>, <span class="st">'misalign'</span>]))
+
+<span class="cm"># 3. Confusion matrix — which faults get confused?</span>
+<span class="fn">ConfusionMatrixDisplay.from_predictions</span>(
+    y_test, rf.<span class="fn">predict</span>(X_test),
+    display_labels=[<span class="st">'normal'</span>, <span class="st">'bearing'</span>, <span class="st">'overheat'</span>, <span class="st">'misalign'</span>])
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. Feature importance — which sensors matter?</span>
+feat_imp = <span class="fn">pd.Series</span>(rf.feature_importances_, index=sensor_names)
+<span class="fn">print</span>(feat_imp.<span class="fn">sort_values</span>(ascending=<span class="kw">False</span>).<span class="fn">head</span>(<span class="nm">10</span>))
+
+<span class="cm"># 5. Predict live fault type + confidence</span>
+pred_prob = rf.<span class="fn">predict_proba</span>(live_reading)
+<span class="fn">print</span>(<span class="st">f"Fault: {fault_names[pred_prob.argmax()]} ({pred_prob.max():.2%} confidence)"</span>)`
+  },
+
+  pca: {
+    title: "PCA",
+    desc: "Principal Component Analysis for dimensionality reduction and anomaly detection. Sensors are often correlated — PCA finds which combinations of readings deviate from normal.",
+    questions: [
+      "Which combinations of sensors move together? (correlation structure)",
+      "Can we reduce 50 sensor channels to a handful of meaningful components?",
+      "How do we visualize high-dimensional sensor data?",
+      "Which readings contribute to unexpected variance?"
+    ],
+    metric: "<strong>Key metric:</strong> Explained variance ratio (how much info is retained) and SPE/T² statistics for anomaly detection. Visualize with biplots to interpret components.",
+    code: `<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 1. Scale (PCA is sensitive to scale)</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(sensor_df)
+
+<span class="cm"># 2. Fit PCA — choose n_components by explained variance</span>
+pca = <span class="fn">PCA</span>(n_components=<span class="nm">0.95</span>)  <span class="cm"># keep 95% of variance</span>
+X_pca = pca.<span class="fn">fit_transform</span>(X_scaled)
+<span class="fn">print</span>(<span class="st">f"Components needed: {pca.n_components_}"</span>)
+<span class="fn">print</span>(<span class="st">f"Variance explained: {pca.explained_variance_ratio_.cumsum()[-1]:.3f}"</span>)
+
+<span class="cm"># 3. Scree plot</span>
+plt.<span class="fn">plot</span>(np.<span class="fn">cumsum</span>(pca.explained_variance_ratio_))
+plt.<span class="fn">xlabel</span>(<span class="st">'Components'</span>); plt.<span class="fn">ylabel</span>(<span class="st">'Cumulative variance'</span>); plt.<span class="fn">show</span>()
+
+<span class="cm"># 4. SPE (Squared Prediction Error) for anomaly detection</span>
+X_reconstructed = pca.<span class="fn">inverse_transform</span>(X_pca)
+spe = np.<span class="fn">sum</span>((X_scaled - X_reconstructed) ** <span class="nm">2</span>, axis=<span class="nm">1</span>)
+threshold = np.<span class="fn">percentile</span>(spe[:<span class="nm">n_normal</span>], <span class="nm">99</span>)
+anomalies = spe > threshold
+<span class="fn">print</span>(<span class="st">f"Anomalies: {anomalies.sum()}"</span>)
+
+<span class="cm"># 5. Biplot: which sensors define each PC?</span>
+loadings = <span class="fn">pd.DataFrame</span>(pca.components_.T,
+    index=sensor_names, columns=[<span class="st">f'PC{i+1}'</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(pca.n_components_)])
+<span class="fn">print</span>(loadings[[<span class="st">'PC1'</span>,<span class="st">'PC2'</span>]].<span class="fn">sort_values</span>(<span class="st">'PC1'</span>))`
+  },
+
+  svm: {
+    title: "SVM (One-Class / Fault Detection)",
+    desc: "Support Vector Machine — One-Class SVM learns a boundary around normal behavior. Binary SVM classifies fault vs. no fault. Effective in high-dimensional sensor spaces.",
+    questions: [
+      "Can we define a boundary of 'normal' without any failure examples?",
+      "Is this sensor state inside or outside the normal operating envelope?",
+      "How do we handle non-linear boundaries between normal and fault states?"
+    ],
+    metric: "<strong>Key metric:</strong> For One-Class SVM — false positive rate at operating point. For binary SVM — F1 score on the minority (fault) class.",
+    code: `<span class="kw">from</span> sklearn.svm <span class="kw">import</span> OneClassSVM, SVC
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> GridSearchCV
+
+<span class="cm"># ── Option A: One-Class SVM (no failure labels needed) ──</span>
+scaler   = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X_normal_only)
+
+oc_svm = <span class="fn">OneClassSVM</span>(
+    kernel=<span class="st">'rbf'</span>, nu=<span class="nm">0.05</span>,  <span class="cm"># nu ≈ expected anomaly fraction</span>
+    gamma=<span class="st">'scale'</span>)
+oc_svm.<span class="fn">fit</span>(X_scaled)
+
+preds = oc_svm.<span class="fn">predict</span>(scaler.<span class="fn">transform</span>(X_test))
+<span class="cm"># -1 = anomaly, +1 = normal</span>
+<span class="fn">print</span>(<span class="st">f"Anomaly rate: {(preds==-1).mean():.3f}"</span>)
+
+<span class="cm"># ── Option B: Binary SVM (with labeled failure data) ──</span>
+X_all_scaled = scaler.<span class="fn">fit_transform</span>(X_all)
+svm = <span class="fn">SVC</span>(kernel=<span class="st">'rbf'</span>, class_weight=<span class="st">'balanced'</span>, probability=<span class="kw">True</span>)
+
+<span class="cm"># Tune C and gamma via grid search</span>
+grid = <span class="fn">GridSearchCV</span>(svm,
+    {<span class="st">'C'</span>: [<span class="nm">0.1</span>, <span class="nm">1</span>, <span class="nm">10</span>], <span class="st">'gamma'</span>: [<span class="st">'scale'</span>, <span class="st">'auto'</span>]},
+    cv=<span class="nm">5</span>, scoring=<span class="st">'f1'</span>)
+grid.<span class="fn">fit</span>(X_all_scaled, y_all)
+<span class="fn">print</span>(grid.best_params_)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, grid.<span class="fn">predict</span>(X_test_scaled)))`
+  },
+
+  cnn: {
+    title: "CNN (Visual Quality Control)",
+    desc: "Detects product defects from camera images on the production line — scratches, cracks, missing parts, incorrect assembly. Fine-tuned from ImageNet-pretrained models.",
+    questions: [
+      "Is this product defective? (pass/fail)",
+      "What type of defect is this — crack, scratch, or contamination?",
+      "Where exactly on the product is the defect? (segmentation)",
+      "How do we reduce false rejections that waste good products?"
+    ],
+    metric: "<strong>Key metric:</strong> Recall (don't ship defects) and False Rejection Rate (don't waste good products). Visualize with Grad-CAM to verify the model looks at defects, not background.",
+    code: `<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">from</span> torchvision <span class="kw">import</span> models, transforms
+<span class="kw">from</span> torch.utils.data <span class="kw">import</span> DataLoader, WeightedRandomSampler
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+
+<span class="cm"># 1. Augmentation for defect images</span>
+train_tfm = transforms.<span class="fn">Compose</span>([
+    transforms.<span class="fn">Resize</span>((<span class="nm">224</span>,<span class="nm">224</span>)),
+    transforms.<span class="fn">RandomHorizontalFlip</span>(),
+    transforms.<span class="fn">RandomRotation</span>(<span class="nm">15</span>),
+    transforms.<span class="fn">ColorJitter</span>(brightness=<span class="nm">0.2</span>, contrast=<span class="nm">0.2</span>),
+    transforms.<span class="fn">ToTensor</span>(),
+    transforms.<span class="fn">Normalize</span>([<span class="nm">0.485</span>,<span class="nm">0.456</span>,<span class="nm">0.406</span>], [<span class="nm">0.229</span>,<span class="nm">0.224</span>,<span class="nm">0.225</span>])
+])
+
+<span class="cm"># 2. Oversample defects (rare class) using WeightedRandomSampler</span>
+class_weights = [<span class="nm">1</span> <span class="kw">if</span> label==<span class="nm">0</span> <span class="kw">else</span> <span class="nm">5</span> <span class="kw">for</span> label <span class="kw">in</span> train_labels]
+sampler = <span class="fn">WeightedRandomSampler</span>(class_weights, <span class="fn">len</span>(class_weights))
+loader  = <span class="fn">DataLoader</span>(train_ds, batch_size=<span class="nm">32</span>, sampler=sampler)
+
+<span class="cm"># 3. Fine-tune EfficientNet</span>
+model = models.<span class="fn">efficientnet_b0</span>(pretrained=<span class="kw">True</span>)
+<span class="cm"># Freeze backbone, train head only first</span>
+<span class="kw">for</span> param <span class="kw">in</span> model.features.parameters():
+    param.requires_grad = <span class="kw">False</span>
+model.classifier = nn.<span class="fn">Sequential</span>(
+    nn.<span class="fn">Dropout</span>(<span class="nm">0.3</span>), nn.<span class="fn">Linear</span>(<span class="nm">1280</span>, <span class="nm">2</span>))
+model.<span class="fn">to</span>(device)
+
+<span class="cm"># 4. Evaluate — recall is the critical metric (don't ship defects)</span>
+<span class="fn">print</span>(<span class="fn">classification_report</span>(
+    y_test, preds, target_names=[<span class="st">'pass'</span>, <span class="st">'defect'</span>]))`
+  }
+},
+
+tech: {
+  bert: {
+    title: "Transformers / BERT",
+    desc: "Pretrained language models fine-tuned for text classification, NER, or Q&A. Use ClinicalBERT for medical text, FinBERT for financial, or distilBERT when you need speed.",
+    questions: [
+      "Is this review positive, negative, or neutral?",
+      "What category does this support ticket belong to?",
+      "Is this content violating community guidelines?",
+      "What intent does this user query express?"
+    ],
+    metric: "<strong>Key metric:</strong> Macro F1-score per class. Always baseline with TF-IDF + Logistic Regression first — if BERT only adds 2% F1, it may not be worth the inference cost.",
+    code: `<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Tokenize</span>
+tokenizer = AutoTokenizer.<span class="fn">from_pretrained</span>(<span class="st">'distilbert-base-uncased'</span>)
+model     = AutoModelForSequenceClassification.<span class="fn">from_pretrained</span>(
+    <span class="st">'distilbert-base-uncased'</span>, num_labels=n_classes)
+
+<span class="kw">def</span> <span class="fn">tokenize_fn</span>(batch):
+    <span class="kw">return</span> <span class="fn">tokenizer</span>(batch[<span class="st">'text'</span>], truncation=<span class="kw">True</span>,
+        padding=<span class="st">'max_length'</span>, max_length=<span class="nm">256</span>)
+train_ds = train_ds.<span class="fn">map</span>(tokenize_fn, batched=<span class="kw">True</span>)
+val_ds   = val_ds.<span class="fn">map</span>(tokenize_fn, batched=<span class="kw">True</span>)
+
+<span class="cm"># 2. Custom metrics for Trainer</span>
+<span class="kw">def</span> <span class="fn">compute_metrics</span>(eval_pred):
+    logits, labels = eval_pred
+    preds = np.<span class="fn">argmax</span>(logits, axis=-<span class="nm">1</span>)
+    report = <span class="fn">classification_report</span>(labels, preds, output_dict=<span class="kw">True</span>)
+    <span class="kw">return</span> {<span class="st">'macro_f1'</span>: report[<span class="st">'macro avg'</span>][<span class="st">'f1-score'</span>]}
+
+<span class="cm"># 3. Train</span>
+args = <span class="fn">TrainingArguments</span>(
+    output_dir=<span class="st">'./bert-clf'</span>, num_train_epochs=<span class="nm">4</span>,
+    per_device_train_batch_size=<span class="nm">16</span>, learning_rate=<span class="nm">2e-5</span>,
+    evaluation_strategy=<span class="st">'epoch'</span>, load_best_model_at_end=<span class="kw">True</span>,
+    metric_for_best_model=<span class="st">'macro_f1'</span>)
+trainer = <span class="fn">Trainer</span>(model=model, args=args,
+    train_dataset=train_ds, eval_dataset=val_ds,
+    compute_metrics=compute_metrics)
+trainer.<span class="fn">train</span>()
+
+<span class="cm"># 4. Final evaluation</span>
+preds = trainer.<span class="fn">predict</span>(test_ds)
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, preds.predictions.<span class="fn">argmax</span>(-<span class="nm">1</span>)))`
+  },
+
+  logreg: {
+    title: "Logistic Regression (NLP Baseline)",
+    desc: "TF-IDF features + Logistic Regression. Surprisingly strong for text classification and should always be your baseline before reaching for transformers. Fast to train, easy to debug.",
+    questions: [
+      "Is this email spam or not?",
+      "Can we classify support tickets by topic quickly and cheaply?",
+      "What words are most predictive of each category?",
+      "How fast can we get a working classifier into production?"
+    ],
+    metric: "<strong>Key metric:</strong> F1 per class. Check which words have the highest coefficients — if nonsense words dominate, you have data leakage or preprocessing issues.",
+    code: `<span class="kw">from</span> sklearn.feature_extraction.text <span class="kw">import</span> TfidfVectorizer
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LogisticRegression
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Pipeline: TF-IDF + Logistic Regression</span>
+pipe = <span class="fn">Pipeline</span>([
+    (<span class="st">'tfidf'</span>, <span class="fn">TfidfVectorizer</span>(
+        max_features=<span class="nm">50000</span>, ngram_range=(<span class="nm">1</span>,<span class="nm">2</span>),
+        sublinear_tf=<span class="kw">True</span>, min_df=<span class="nm">2</span>)),
+    (<span class="st">'lr'</span>, <span class="fn">LogisticRegression</span>(
+        C=<span class="nm">1.0</span>, class_weight=<span class="st">'balanced'</span>,
+        solver=<span class="st">'lbfgs'</span>, max_iter=<span class="nm">1000</span>, multi_class=<span class="st">'auto'</span>))
+])
+pipe.<span class="fn">fit</span>(X_train_text, y_train)
+
+<span class="cm"># 2. Evaluate</span>
+<span class="fn">print</span>(<span class="fn">classification_report</span>(y_test, pipe.<span class="fn">predict</span>(X_test_text)))
+
+<span class="cm"># 3. Inspect top words per class</span>
+tfidf  = pipe.named_steps[<span class="st">'tfidf'</span>]
+lr     = pipe.named_steps[<span class="st">'lr'</span>]
+<span class="kw">for</span> i, class_name <span class="kw">in</span> <span class="fn">enumerate</span>(lr.classes_):
+    top_idx = np.<span class="fn">argsort</span>(lr.coef_[i])[-<span class="nm">10</span>:][::-<span class="nm">1</span>]
+    top_words = [tfidf.get_feature_names_out()[j] <span class="kw">for</span> j <span class="kw">in</span> top_idx]
+    <span class="fn">print</span>(<span class="st">f"{class_name}: {', '.join(top_words)}"</span>)
+
+<span class="cm"># 4. Sanity check: any suspicious features? (data leakage)</span>
+<span class="cm"># If 'ticket_id' or 'agent_name' appear — you have leakage</span>`
+  },
+
+  lgbm: {
+    title: "LightGBM (CTR Prediction)",
+    desc: "Gradient boosting optimized for speed and large datasets. The workhorse for click-through rate (CTR), conversion prediction, and ad ranking in production systems.",
+    questions: [
+      "Will this user click on this ad?",
+      "Which users are most likely to convert after seeing this offer?",
+      "How do we rank ads to maximize revenue per impression?",
+      "Which user features drive click probability?"
+    ],
+    metric: "<strong>Key metric:</strong> Log loss and AUC for probability calibration. In production, also track CTR lift in A/B tests — offline AUC doesn't always translate to online gains.",
+    code: `<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> roc_auc_score, log_loss
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. LightGBM Dataset (memory-efficient)</span>
+dtrain = lgb.<span class="fn">Dataset</span>(X_train, label=y_train,
+    categorical_feature=cat_features)
+dval   = lgb.<span class="fn">Dataset</span>(X_val, label=y_val, reference=dtrain)
+
+<span class="cm"># 2. Params tuned for CTR (binary classification)</span>
+params = {
+    <span class="st">'objective'</span>: <span class="st">'binary'</span>, <span class="st">'metric'</span>: [<span class="st">'binary_logloss'</span>, <span class="st">'auc'</span>],
+    <span class="st">'learning_rate'</span>: <span class="nm">0.05</span>, <span class="st">'num_leaves'</span>: <span class="nm">63</span>,
+    <span class="st">'feature_fraction'</span>: <span class="nm">0.8</span>, <span class="st">'bagging_fraction'</span>: <span class="nm">0.8</span>,
+    <span class="st">'bagging_freq'</span>: <span class="nm">5</span>, <span class="st">'min_child_samples'</span>: <span class="nm">50</span>,
+    <span class="st">'scale_pos_weight'</span>: <span class="nm">50</span>,  <span class="cm"># clicks are rare</span>
+    <span class="st">'verbose'</span>: -<span class="nm">1</span>
+}
+model = lgb.<span class="fn">train</span>(params, dtrain,
+    num_boost_round=<span class="nm">1000</span>, valid_sets=[dval],
+    callbacks=[lgb.<span class="fn">early_stopping</span>(<span class="nm">50</span>), lgb.<span class="fn">log_evaluation</span>(<span class="nm">100</span>)])
+
+<span class="cm"># 3. Evaluate</span>
+y_prob = model.<span class="fn">predict</span>(X_test)
+<span class="fn">print</span>(<span class="st">f"AUC:      {roc_auc_score(y_test, y_prob):.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"Log Loss: {log_loss(y_test, y_prob):.4f}"</span>)
+
+<span class="cm"># 4. Feature importance</span>
+lgb.<span class="fn">plot_importance</span>(model, importance_type=<span class="st">'gain'</span>, max_num_features=<span class="nm">15</span>)`
+  },
+
+  ab: {
+    title: "A/B Testing",
+    desc: "Statistical hypothesis testing to determine if a product change caused a real improvement. Not an ML model — but data scientists own this in most tech companies.",
+    questions: [
+      "Did this new feature actually increase conversion?",
+      "Is the observed difference in CTR statistically significant?",
+      "How long do we need to run this test to detect a real effect?",
+      "Could this result be explained by randomness alone?"
+    ],
+    metric: "<strong>Key metric:</strong> p-value + confidence interval on effect size. Always compute sample size before starting — running until p<0.05 causes false positives (p-hacking).",
+    code: `<span class="kw">from</span> scipy <span class="kw">import</span> stats
+<span class="kw">from</span> statsmodels.stats.power <span class="kw">import</span> zt_ind_solve_power
+<span class="kw">from</span> statsmodels.stats.proportion <span class="kw">import</span> proportions_ztest
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># 1. Pre-test: calculate required sample size BEFORE running</span>
+baseline_rate = <span class="nm">0.05</span>  <span class="cm"># current conversion rate</span>
+mde           = <span class="nm">0.005</span>  <span class="cm"># minimum detectable effect (0.5pp lift)</span>
+effect_size   = mde / np.<span class="fn">sqrt</span>(baseline_rate * (<span class="nm">1</span> - baseline_rate))
+n_required = <span class="fn">zt_ind_solve_power</span>(
+    effect_size=effect_size, alpha=<span class="nm">0.05</span>, power=<span class="nm">0.80</span>)
+<span class="fn">print</span>(<span class="st">f"Samples needed per group: {int(n_required)}"</span>)
+
+<span class="cm"># 2. After test — two-proportion z-test</span>
+control_conv  = <span class="nm">487</span>    <span class="cm"># conversions in control</span>
+control_n     = <span class="nm">10000</span>  <span class="cm"># total in control</span>
+treatment_conv= <span class="nm">532</span>
+treatment_n   = <span class="nm">10000</span>
+
+count  = np.<span class="fn">array</span>([treatment_conv, control_conv])
+nobs   = np.<span class="fn">array</span>([treatment_n,   control_n])
+z, p   = <span class="fn">proportions_ztest</span>(count, nobs, alternative=<span class="st">'larger'</span>)
+<span class="fn">print</span>(<span class="st">f"z-stat: {z:.3f} | p-value: {p:.4f}"</span>)
+
+<span class="cm"># 3. Confidence interval on the lift</span>
+rate_t = treatment_conv / treatment_n
+rate_c = control_conv   / control_n
+diff   = rate_t - rate_c
+se     = np.<span class="fn">sqrt</span>(rate_t*(1-rate_t)/treatment_n + rate_c*(1-rate_c)/control_n)
+ci     = (diff - 1.96*se, diff + 1.96*se)
+<span class="fn">print</span>(<span class="st">f"Lift: {diff*100:.2f}pp | 95% CI: ({ci[0]*100:.2f}pp, {ci[1]*100:.2f}pp)"</span>)
+<span class="fn">print</span>(<span class="st">"Significant!"</span> <span class="kw">if</span> p < <span class="nm">0.05</span> <span class="kw">else</span> <span class="st">"Not significant."</span>)`
+  },
+
+  collab: {
+    title: "Collaborative Filtering (Tech)",
+    desc: "Powers recommendation in streaming, social, and content platforms. Learns from implicit signals (plays, clicks, watch time) rather than explicit ratings.",
+    questions: [
+      "Which videos/songs/posts should we surface next for this user?",
+      "Can we recommend without knowing content features? (pure CF)",
+      "How do we handle brand-new users with no history?",
+      "How do we measure recommendation quality in an online A/B test?"
+    ],
+    metric: "<strong>Key metric:</strong> Precision@K, Recall@K, NDCG@K offline. Online: CTR on recommended items and session length change. Offline metrics are necessary but not sufficient.",
+    code: `<span class="kw">import</span> implicit
+<span class="kw">from</span> scipy.sparse <span class="kw">import</span> csr_matrix
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+<span class="cm"># 1. Build user-item matrix from implicit signals (plays, clicks)</span>
+<span class="cm"># Confidence: c_ui = 1 + alpha * r_ui (higher interaction = more confident)</span>
+alpha = <span class="nm">40</span>
+interactions[<span class="st">'confidence'</span>] = <span class="nm">1</span> + alpha * interactions[<span class="st">'play_count'</span>]
+user_item = <span class="fn">csr_matrix</span>((
+    interactions[<span class="st">'confidence'</span>],
+    (interactions[<span class="st">'user_idx'</span>], interactions[<span class="st">'item_idx'</span>])))
+
+<span class="cm"># 2. Train ALS model</span>
+model = implicit.als.<span class="fn">AlternatingLeastSquares</span>(
+    factors=<span class="nm">128</span>, regularization=<span class="nm">0.01</span>,
+    iterations=<span class="nm">50</span>, use_gpu=<span class="kw">False</span>)
+model.<span class="fn">fit</span>(user_item)
+
+<span class="cm"># 3. Recommend top-10 for a user</span>
+user_id = <span class="nm">1234</span>
+recs, scores = model.<span class="fn">recommend</span>(
+    user_id, user_item[user_id], N=<span class="nm">10</span>,
+    filter_already_liked_items=<span class="kw">True</span>)
+<span class="fn">print</span>(item_lookup.<span class="fn">iloc</span>[recs])
+
+<span class="cm"># 4. NDCG@K evaluation</span>
+<span class="kw">def</span> <span class="fn">ndcg_at_k</span>(recommended, relevant, k=<span class="nm">10</span>):
+    dcg  = <span class="fn">sum</span>([<span class="nm">1</span>/np.<span class="fn">log2</span>(i+<span class="nm">2</span>) <span class="kw">for</span> i,r <span class="kw">in</span> <span class="fn">enumerate</span>(recommended[:k]) <span class="kw">if</span> r <span class="kw">in</span> relevant])
+    idcg = <span class="fn">sum</span>([<span class="nm">1</span>/np.<span class="fn">log2</span>(i+<span class="nm">2</span>) <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">min</span>(k, <span class="fn">len</span>(relevant)))])
+    <span class="kw">return</span> dcg/idcg <span class="kw">if</span> idcg > <span class="nm">0</span> <span class="kw">else</span> <span class="nm">0</span>
+scores = [<span class="fn">ndcg_at_k</span>(user_recs[u], held_out[u]) <span class="kw">for</span> u <span class="kw">in</span> test_users]
+<span class="fn">print</span>(<span class="st">f"Mean NDCG@10: {np.mean(scores):.3f}"</span>)`
+  }
+}
+};
+
+// ─── DEFAULT MODELS ────────────────────────────────────────────────────────
+const DEFAULTS = {
+  finance: 'xgboost',
+  healthcare: 'rf',
+  retail: 'kmeans',
+  manufacturing: 'isoforest',
+  tech: 'bert'
+};
+
+// ─── RENDER ────────────────────────────────────────────────────────────────
+function renderDetail(industry, modelKey) {
+  const d = DATA[industry][modelKey];
+  if (!d) return;
+  const el = document.getElementById('detail-' + industry);
+  el.innerHTML = `
+    <div class="detail-area">
+      <div class="card">
+        <div class="card-label">Selected model</div>
+        <div class="model-title">${d.title}</div>
+        <div class="model-desc">${d.desc}</div>
+      </div>
+      <div class="top-row">
+        <div class="card">
+          <div class="card-label">Questions this model answers</div>
+          <ul class="q-list">${d.questions.map(q=>`<li>${q}</li>`).join('')}</ul>
+        </div>
+        <div class="card">
+          <div class="card-label">Core workflow &amp; evaluation</div>
+          <div class="code-wrap">
+            <div class="code-header">
+              <div class="code-dots"><span></span><span></span><span></span></div>
+              <span class="code-lang">PYTHON</span>
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+            </div>
+            <pre>${d.code}</pre>
+          </div>
+          <div class="metric-note">${d.metric}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function showModel(industry, modelKey, btn) {
+  document.querySelectorAll(`#ip-${industry} .model-btn`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDetail(industry, modelKey);
+}
+
+function showIndustry(id, btn) {
+  document.querySelectorAll('.industry-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('ip-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+Object.keys(DEFAULTS).forEach(ind => renderDetail(ind, DEFAULTS[ind]));
+</script>
+</body>
+</html>
